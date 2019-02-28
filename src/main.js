@@ -1,6 +1,8 @@
 import * as THREE from './libs/three';
 import BasicRubik from './object/Rubik';
 
+require('./libs/OrbitControls');
+
 const Context = canvas.getContext('webgl');
 
 export default class Main {
@@ -36,6 +38,12 @@ export default class Main {
         this.camera.position.set(0, 0, 300 / this.camera.aspect);
         this.camera.up.set(0, 1, 0);
         this.camera.lookAt(this.viewCenter);
+
+        //轨道视角控制器
+        this.orbitController = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.orbitController.enableZoom = false;
+        this.orbitController.rotateSpeed = 2;
+        this.orbitController.target = this.viewCenter;//设置控制点
     }
 
     initScene() {
