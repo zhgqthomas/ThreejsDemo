@@ -1,7 +1,7 @@
 import * as THREE from '../libs/three';
 
-const BaisParams = {
-    position: {
+const BasicParams = {
+    point: {
         x: 0,
         y: 0,
         z: 0,
@@ -19,10 +19,13 @@ function faces(color) {
     canvas.width = 256;
     canvas.height = 256;
     const context = canvas.getContext('2d');
-    context.fillStyle = 'black';
+    //画一个宽高都是256的黑色正方形
+    context.fillStyle = 'rgba(0,0,0,1)';
     context.fillRect(0, 0, 256, 256);
+    //在内部用某颜色的16px宽的线再画一个宽高为224的圆角正方形并用改颜色填充
     context.rect(16, 16, 224, 224);
     context.lineJoin = 'round';
+    context.lineWidth = 16;
     context.fillStyle = color;
     context.strokeStyle = color;
     context.stroke();
@@ -30,21 +33,65 @@ function faces(color) {
     return canvas;
 }
 
-function caculateCubeCenterPointByLeftPoint(x, y, z, len) {
+function caculateCubeCenterPointByLeftPoint(leftPoint, len) {
     return {
-        x: x + len / 2,
-        y: y - len / 2,
-        z: z - len / 2,
+        x: leftPoint.x + len / 2,
+        y: leftPoint.y - len / 2,
+        z: leftPoint.z - len / 2,
     }
 }
 
 class SimpleCube {
 
-    constructor(position, num, len) {
-        this.leftPoint = {
-            x: position.x - num * len / 2,
-            y: position.y + num * len / 2,
-            z: position.z + num * len / 2,
+    constructor(point, num, len) {
+        let leftPoint = {
+            x: point.x - num * len / 2,
+            y: point.y + num * len / 2,
+            z: point.z + num * len / 2,
+        };
+
+        this.cubes = [];
+        for (let i = 0; i < num; ++i) {
+            for (let j = 0; j < num * num; ++j) {
+                let materials = [];
+                for (let k = 0; k < 6; ++k) {
+                    let texture = new THREE.Texture(faces(BasicParams.colors[k]));
+                    texture.needsUpdate = true;
+                    materials.push(new THREE.MeshLambertMaterial({
+                        map: texture,
+                    }));
+
+                    let cubeGeometry = new THREE.BoxGeometry(len, len, len);
+                    let cube = new THREE.Mesh(cubeGeometry, materials);
+                    let centerPoint = caculateCubeCenterPointByLeftPoint(leftPoint, len);
+
+                    cube.position.x = centerPoint.x + (j % num) * len;
+                    cube.position.y = centerPoint.y - parseInt(j / num) * len;
+                    cube.position.z = centerPoint.z - i * len;
+
+                    this.cubes.push(cube);
+                }
+            }
+        }
+    }
+
+    getCubes() {
+        return this.cubes;
+    }
+}
+
+export default class Rubik {
+
+    constructor(main) {
+        this.main = main;
+    }
+
+    model() {
+        let cubes = new SimpleCube(BasicParams.point, BasicParams.num, BasicParams.len).getCubes();
+        let length = cubes.length;
+        for (let i = 0; i < length; ++i) {
+            let item = cubes[i];
+            this.main.scene.add(item);
         }
     }
 }

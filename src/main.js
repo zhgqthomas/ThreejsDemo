@@ -1,5 +1,5 @@
 import * as THREE from './libs/three';
-import {canvas} from "./adapter/window";
+import BasicRubik from './object/Rubik';
 
 const Context = canvas.getContext('webgl');
 
@@ -7,7 +7,7 @@ export default class Main {
     constructor() {
         this.context = Context;
         this.width = window.innerWidth;
-        this.heigth = window.innerHeight;
+        this.height = window.innerHeight;
         this.devicePixelRatio = window.devicePixelRatio;
         this.viewCenter = new THREE.Vector3(0, 0, 0);
 
@@ -22,17 +22,17 @@ export default class Main {
     initRender() {
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
-            canvas: this.context,
+            context: this.context,
         });
-        this.renderer.setSize(this.width, this.heigth);
+        this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(this.devicePixelRatio);
         this.renderer.setClearColor(0xFFFFFF, 1.0);
         canvas.width = this.width * this.devicePixelRatio;
-        canvas.heigth = this.heigth * this.devicePixelRatio;
+        canvas.height = this.height * this.devicePixelRatio;
     }
 
     initCamera() {
-        this.camera = new THREE.PerspectiveCamera(45, this.width / this.heigth, 1, 1500);
+        this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 1, 1500);
         this.camera.position.set(0, 0, 300 / this.camera.aspect);
         this.camera.up.set(0, 1, 0);
         this.camera.lookAt(this.viewCenter);
@@ -48,7 +48,8 @@ export default class Main {
     }
 
     initObject() {
-
+        let rubik = new BasicRubik(this);
+        rubik.model();
     }
 
     render() {
