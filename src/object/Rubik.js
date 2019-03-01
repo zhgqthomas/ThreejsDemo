@@ -33,7 +33,7 @@ function faces(color) {
     return canvas;
 }
 
-function caculateCubeCenterPointByLeftPoint(leftPoint, len) {
+function calculateCubeCenterPointByLeftPoint(leftPoint, len) {
     return {
         x: leftPoint.x + len / 2,
         y: leftPoint.y - len / 2,
@@ -63,7 +63,7 @@ class SimpleCube {
 
                     let cubeGeometry = new THREE.BoxGeometry(len, len, len);
                     let cube = new THREE.Mesh(cubeGeometry, materials);
-                    let centerPoint = caculateCubeCenterPointByLeftPoint(leftPoint, len);
+                    let centerPoint = calculateCubeCenterPointByLeftPoint(leftPoint, len);
 
                     cube.position.x = centerPoint.x + (j % num) * len;
                     cube.position.y = centerPoint.y - parseInt(j / num) * len;
@@ -86,12 +86,30 @@ export default class Rubik {
         this.main = main;
     }
 
-    model() {
+    model(type) {
+        this.group = new THREE.Group();
+        this.group.childType = type;
+
         let cubes = new SimpleCube(BasicParams.point, BasicParams.num, BasicParams.len).getCubes();
         let length = cubes.length;
         for (let i = 0; i < length; ++i) {
             let item = cubes[i];
-            this.main.scene.add(item);
+            this.group.add(item);
         }
+
+        this.main.scene.add(this.group);
+    }
+
+    resizeHeight(percent, transformTag) {
+        if (percent < this.main.minPercent) {
+            percent = this.main.minPercent;
+        }
+
+        if (percent > this.main.maxPercent) {
+            percent = this.main.maxPercent;
+        }
+
+        this.group.scale.set(percent, percent, percent);
+        this.group.position.y = this.main.originHeight * (0.5 - percent / 2) * transformTag;
     }
 }
