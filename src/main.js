@@ -92,15 +92,17 @@ export default class Main {
         wx.onTouchEnd(this.touchEnd.bind(this));
     }
 
-    touchStart(event) {
-
+    touchStart({ touches }) {
+        console.log('touchStart: ', touches);
+        let isHover = this.touchLine.isHover(touches[0]);
+        console.log('isHover: ', isHover);
     }
 
-    touchMove(event) {
-
+    touchMove({ touches }) {
+        console.log('touchMove: ', touches);
     }
 
-    touchEnd(event) {
-
+    touchEnd({ touches }) {
+        console.log('touchEnd: ', touches);
     }
 }
